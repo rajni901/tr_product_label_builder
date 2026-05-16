@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_product_label" model="ir.actions.report">
+        <field name="name">Product Label</field>
+        <field name="model">print.label.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">tr_product_label_builder.report_product_label</field>
+        <field name="report_file">tr_product_label_builder.report_product_label</field>
+        <field name="print_report_name">'Product Labels'</field>
+        <field name="paperformat_id" ref="base.paperformat_a4"/>
+    </record>
+
+    <template id="report_product_label">
+        <t t-call="web.html_container">
+            <t t-set="o" t-value="docs"/>
+            <t t-set="template" t-value="env['product.label.template'].browse(data['template_id'])"/>
+            <t t-set="products" t-value="env['product.product'].browse(data['product_ids'])"/>
+            <t t-set="quantity" t-value="data['quantity']"/>
+            <t t-set="pricelist" t-value="env['product.pricelist'].browse(data['pricelist_id']) if data.get('pricelist_id') else False"/>
+            <t t-set="company" t-value="env.company"/>
+
+            <t t-set="label_size" t-value="template.label_size"/>
+            <t t-set="is_a4" t-value="label_size == 'a4'"/>
+
+            <div t-if="is_a4" class="tr-label-a4-page">
+                <t t-foreach="products" t-as="product">
+                    <t t-foreach="range(quantity)" t-as="q">
+                        <t t-call="tr_product_label_builder.single_label"/>
+                    </t>
+                </t>
+            </div>
+
+            <t t-else="">
+                <t t-foreach="products" t-as="product">
+                    <t t-foreach="range(quantity)" t-as="q">
+                        <div class="page">
+                            <t t-call="tr_product_label_builder.single_label"/>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="single_label">
+        <div t-att-class="'tr-label-card tr-label-' + (label_size or '100x50')"
+             t-attf-style="border-color: #{template.header_color or '#1a1a5e'}; color: #{template.text_color or '#2d2d2d'};">
+
+            <!-- Header with company logo and name -->
+            <div class="tr-label-header"
+                 t-attf-style="background: #{template.header_color or '#1a1a5e'};">
+                <t t-if="template.show_logo and company.logo">
+                    <img t-att-src="image_data_uri(company.logo)"
+                         class="tr-label-logo" alt="Logo"/>
+                </t>
+                <span class="tr-label-company" t-esc="company.name"/>
+            </div>
+
+            <!-- Product Name -->
+            <t t-if="template.show_name">
+                <div t-att-class="'tr-label-name tr-font-' + (template.font_size or 'medium')"
+                     t-esc="product.name"/>
+            </t>
+
+            <!-- Internal Reference -->
+            <t t-if="template.show_internal_ref and product.default_code">
+                <div class="tr-label-ref">
+                    SKU: <span t-esc="product.default_code"/>
+                </div>
+            </t>
+
+            <!-- Category -->
+            <t t-if="template.show_category and product.categ_id">
+                <div class="tr-label-category" t-esc="product.categ_id.name"/>
+            </t>
+
+            <!-- Price -->
+            <t t-if="template.show_price">
+                <div class="tr-label-price">
+                    <t t-if="pricelist">
+                        <span t-out="pricelist._get_product_price(product, 1)"
+                              t-options="{'widget': 'monetary', 'display_currency': pricelist.currency_id}"/>
+                    </t>
+                    <t t-else="">
+                        <span t-out="product.lst_price"
+                              t-options="{'widget': 'monetary', 'display_currency': product.currency_id}"/>
+                    </t>
+                </div>
+            </t>
+
+            <!-- Barcode -->
+            <t t-if="template.show_barcode and product.barcode">
+                <div class="tr-label-barcode">
+                    <div t-out="product.barcode"
+                         t-options="{'widget': 'barcode', 'symbology': 'auto', 'img_style': 'width:100%;max-height:40px;'}"/>
+                    <div class="tr-label-barcode-text" t-esc="product.barcode"/>
+                </div>
+            </t>
+
+            <!-- QR Code -->
+            <t t-if="template.show_qr_code and product.barcode">
+                <div class="tr-label-qr">
+                    <div t-out="product.barcode"
+                         t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:50px;height:50px;'}"/>
+                </div>
+            </t>
+
+            <!-- Footer Note -->
+            <t t-if="template.notes">
+                <div class="tr-label-footer" t-esc="template.notes"/>
+            </t>
+        </div>
+    </template>
+
+</odoo>

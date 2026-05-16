@@ -1,0 +1,143 @@
+/* ── Product Label Builder Pro — Technical Rajni ── */
+
+/* A4 Sheet Layout — 3 columns x 8 rows */
+.tr-label-a4-page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+}
+
+/* Base Label Card */
+.tr-label-card {
+    border: 1.5px solid #1a1a5e;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fff;
+    font-family: Arial, sans-serif;
+    page-break-inside: avoid;
+}
+
+/* Label Sizes */
+.tr-label-50x30 {
+    width: 50mm;
+    min-height: 30mm;
+}
+
+.tr-label-100x50 {
+    width: 100mm;
+    min-height: 50mm;
+}
+
+.tr-label-100x70 {
+    width: 100mm;
+    min-height: 70mm;
+}
+
+.tr-label-dymo {
+    width: 89mm;
+    min-height: 28mm;
+}
+
+.tr-label-a4 {
+    width: calc(33.33% - 4px);
+    min-height: 35mm;
+}
+
+/* Header */
+.tr-label-header {
+    display: flex;
+    align-items: center;
+    padding: 3px 6px;
+    gap: 6px;
+    background: #1a1a5e;
+}
+
+.tr-label-logo {
+    max-height: 18px;
+    max-width: 40px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.tr-label-company {
+    font-size: 6pt;
+    color: rgba(255,255,255,0.9);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Product Name */
+.tr-label-name {
+    padding: 4px 6px 2px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1a1a5e;
+}
+
+.tr-font-small  { font-size: 7pt; }
+.tr-font-medium { font-size: 8.5pt; }
+.tr-font-large  { font-size: 10pt; }
+
+/* Reference / SKU */
+.tr-label-ref {
+    padding: 1px 6px;
+    font-size: 6.5pt;
+    color: #666;
+}
+
+/* Category */
+.tr-label-category {
+    padding: 1px 6px;
+    font-size: 6pt;
+    color: #888;
+    font-style: italic;
+}
+
+/* Price */
+.tr-label-price {
+    padding: 2px 6px;
+    font-size: 11pt;
+    font-weight: 800;
+    color: #1a1a5e;
+}
+
+/* Barcode */
+.tr-label-barcode {
+    padding: 2px 6px;
+    text-align: center;
+}
+
+.tr-label-barcode img {
+    max-width: 100%;
+}
+
+.tr-label-barcode-text {
+    font-size: 6pt;
+    color: #555;
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+/* QR Code */
+.tr-label-qr {
+    padding: 2px 6px;
+    text-align: center;
+}
+
+.tr-label-qr img {
+    width: 50px;
+    height: 50px;
+}
+
+/* Footer */
+.tr-label-footer {
+    padding: 2px 6px;
+    font-size: 5.5pt;
+    color: #aaa;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
