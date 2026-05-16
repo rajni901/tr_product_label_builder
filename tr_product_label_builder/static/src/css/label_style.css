@@ -16,6 +16,8 @@
     background: #fff;
     font-family: Arial, sans-serif;
     page-break-inside: avoid;
+    display: inline-block;
+    vertical-align: top;
 }
 
 /* Label Sizes */
@@ -48,16 +50,21 @@
 .tr-label-header {
     display: flex;
     align-items: center;
-    padding: 3px 6px;
+    justify-content: space-between;
+    padding: 4px 8px;
     gap: 6px;
     background: #1a1a5e;
+    height: 28px;
+    overflow: hidden;
 }
 
 .tr-label-logo {
-    max-height: 18px;
-    max-width: 40px;
+    height: 20px;
+    width: auto;
+    max-width: 60px;
     object-fit: contain;
     filter: brightness(0) invert(1);
+    flex-shrink: 0;
 }
 
 .tr-label-company {
@@ -68,6 +75,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: right;
 }
 
 /* Product Name */

@@ -55,13 +55,7 @@ class PrintLabelWizard(models.TransientModel):
             raise UserError(_('Please select at least one product.'))
         if self.quantity <= 0:
             raise UserError(_('Copies must be greater than zero.'))
+        return self.env.ref(
+            'tr_product_label_builder.action_report_product_label'
+        ).report_action(self)
 
-        data = {
-            'template_id': self.template_id.id,
-            'product_ids': self.product_ids.ids,
-            'quantity': self.quantity,
-            'pricelist_id': self.pricelist_id.id if self.pricelist_id else False,
-        }
-        return self.env.ref('tr_product_label_builder.action_report_product_label').report_action(
-            self, data=data
-        )

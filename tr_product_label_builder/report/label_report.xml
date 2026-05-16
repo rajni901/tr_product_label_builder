@@ -8,107 +8,87 @@
         <field name="report_name">tr_product_label_builder.report_product_label</field>
         <field name="report_file">tr_product_label_builder.report_product_label</field>
         <field name="print_report_name">'Product Labels'</field>
-        <field name="paperformat_id" ref="base.paperformat_a4"/>
+        <field name="paperformat_id" ref="base.paperformat_euro"/>
     </record>
 
     <template id="report_product_label">
         <t t-call="web.html_container">
-            <t t-set="o" t-value="docs"/>
-            <t t-set="template" t-value="env['product.label.template'].browse(data['template_id'])"/>
-            <t t-set="products" t-value="env['product.product'].browse(data['product_ids'])"/>
-            <t t-set="quantity" t-value="data['quantity']"/>
-            <t t-set="pricelist" t-value="env['product.pricelist'].browse(data['pricelist_id']) if data.get('pricelist_id') else False"/>
             <t t-set="company" t-value="env.company"/>
-
-            <t t-set="label_size" t-value="template.label_size"/>
-            <t t-set="is_a4" t-value="label_size == 'a4'"/>
-
-            <div t-if="is_a4" class="tr-label-a4-page">
-                <t t-foreach="products" t-as="product">
-                    <t t-foreach="range(quantity)" t-as="q">
-                        <t t-call="tr_product_label_builder.single_label"/>
-                    </t>
+            <div class="tr-label-a4-page">
+                <t t-foreach="labels" t-as="label">
+                    <t t-set="product" t-value="label['product']"/>
+                    <t t-set="template" t-value="label['template']"/>
+                    <t t-set="pricelist" t-value="label['pricelist']"/>
+                    <t t-call="tr_product_label_builder.single_label"/>
                 </t>
             </div>
-
-            <t t-else="">
-                <t t-foreach="products" t-as="product">
-                    <t t-foreach="range(quantity)" t-as="q">
-                        <div class="page">
-                            <t t-call="tr_product_label_builder.single_label"/>
-                        </div>
-                    </t>
-                </t>
-            </t>
         </t>
     </template>
 
     <template id="single_label">
-        <div t-att-class="'tr-label-card tr-label-' + (label_size or '100x50')"
-             t-attf-style="border-color: #{template.header_color or '#1a1a5e'}; color: #{template.text_color or '#2d2d2d'};">
+        <div t-att-class="'tr-label-card tr-label-' + (template.label_size or '100x50')"
+             t-attf-style="border: 2px solid #{template.header_color or '#1a1a5e'}; border-radius:6px; overflow:hidden; background:#fff; display:inline-block; margin:4px; font-family:Arial,sans-serif; color: #{template.text_color or '#2d2d2d'}; min-width:100mm; max-width:120mm;">
 
-            <!-- Header with company logo and name -->
-            <div class="tr-label-header"
-                 t-attf-style="background: #{template.header_color or '#1a1a5e'};">
+            <!-- Header -->
+            <div t-attf-style="background: #{template.header_color or '#1a1a5e'}; display:flex; align-items:center; justify-content:space-between; padding:4px 8px; height:28px; overflow:hidden;">
                 <t t-if="template.show_logo and company.logo">
                     <img t-att-src="image_data_uri(company.logo)"
-                         class="tr-label-logo" alt="Logo"/>
+                         style="height:20px; width:auto; max-width:55px; object-fit:contain;"
+                         alt="Logo"/>
                 </t>
-                <span class="tr-label-company" t-esc="company.name"/>
+                <span style="font-size:6pt; color:rgba(255,255,255,0.9); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"
+                      t-esc="company.name"/>
             </div>
 
             <!-- Product Name -->
             <t t-if="template.show_name">
-                <div t-att-class="'tr-label-name tr-font-' + (template.font_size or 'medium')"
+                <div style="padding:6px 8px 2px; font-weight:700; font-size:10pt; color:#1a1a5e; line-height:1.2;"
                      t-esc="product.name"/>
             </t>
 
             <!-- Internal Reference -->
             <t t-if="template.show_internal_ref and product.default_code">
-                <div class="tr-label-ref">
+                <div style="padding:1px 8px; font-size:7.5pt; color:#666;">
                     SKU: <span t-esc="product.default_code"/>
                 </div>
             </t>
 
             <!-- Category -->
             <t t-if="template.show_category and product.categ_id">
-                <div class="tr-label-category" t-esc="product.categ_id.name"/>
+                <div style="padding:1px 8px; font-size:7pt; color:#888; font-style:italic;"
+                     t-esc="product.categ_id.name"/>
             </t>
 
             <!-- Price -->
             <t t-if="template.show_price">
-                <div class="tr-label-price">
-                    <t t-if="pricelist">
-                        <span t-out="pricelist._get_product_price(product, 1)"
-                              t-options="{'widget': 'monetary', 'display_currency': pricelist.currency_id}"/>
-                    </t>
-                    <t t-else="">
-                        <span t-out="product.lst_price"
-                              t-options="{'widget': 'monetary', 'display_currency': product.currency_id}"/>
-                    </t>
+                <div style="padding:3px 8px; font-size:13pt; font-weight:800; color:#1a1a5e;">
+                    <t t-esc="product.currency_id.symbol"/>
+                    <t t-esc="'%.2f' % product.lst_price"/>
                 </div>
             </t>
 
             <!-- Barcode -->
             <t t-if="template.show_barcode and product.barcode">
-                <div class="tr-label-barcode">
+                <div style="padding:4px 8px; text-align:center;">
                     <div t-out="product.barcode"
-                         t-options="{'widget': 'barcode', 'symbology': 'auto', 'img_style': 'width:100%;max-height:40px;'}"/>
-                    <div class="tr-label-barcode-text" t-esc="product.barcode"/>
+                         t-options="{'widget': 'barcode', 'symbology': 'auto', 'img_style': 'width:90%;max-height:45px;'}"/>
+                    <div style="font-size:6pt; color:#555; letter-spacing:1px; margin-top:1px;"
+                         t-esc="product.barcode"/>
                 </div>
             </t>
 
             <!-- QR Code -->
             <t t-if="template.show_qr_code and product.barcode">
-                <div class="tr-label-qr">
+                <div style="padding:2px 8px; text-align:center;">
                     <div t-out="product.barcode"
-                         t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:50px;height:50px;'}"/>
+                         t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:55px;height:55px;'}"/>
                 </div>
             </t>
 
             <!-- Footer Note -->
             <t t-if="template.notes">
-                <div class="tr-label-footer" t-esc="template.notes"/>
+                <div style="padding:3px 8px; font-size:6pt; color:#aaa; text-align:center; border-top:1px solid #eee;"
+                     t-esc="template.notes"/>
             </t>
         </div>
     </template>
