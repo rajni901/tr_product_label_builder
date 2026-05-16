@@ -14,7 +14,7 @@
     <template id="report_product_label">
         <t t-call="web.html_container">
             <t t-set="company" t-value="env.company"/>
-            <div style="padding:10px; background:#f0f0f0;">
+            <div style="padding:10px; background:#eeeeee;">
                 <t t-foreach="labels" t-as="label">
                     <t t-set="product" t-value="label['product']"/>
                     <t t-set="template" t-value="label['template']"/>
@@ -26,65 +26,59 @@
     </template>
 
     <template id="single_label">
-        <!-- Outer card -->
-        <div style="background:#ffffff; border-radius:12px; margin:8px auto; width:100mm; box-shadow:0 2px 8px rgba(0,0,0,0.12); overflow:hidden; font-family:Arial,sans-serif; page-break-inside:avoid;">
+        <div style="background:#ffffff; border-radius:12px; margin:8px auto; width:105mm; padding:12px 14px; box-shadow:0 2px 10px rgba(0,0,0,0.1); font-family:Arial,sans-serif; page-break-inside:avoid;">
 
-            <!-- Top bar: logo + company name -->
-            <div t-attf-style="background:#{template.header_color or '#6c3fc5'}; display:flex; align-items:center; gap:6px; padding:5px 10px;">
+            <!-- Row 1: Circle logo + Company name -->
+            <div style="display:flex; align-items:center; gap:7px; margin-bottom:8px;">
                 <t t-if="template.show_logo and company.logo">
-                    <div style="background:#fff; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+                    <div t-attf-style="background:#{template.header_color or '#1a1a5e'}; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
                         <img t-att-src="image_data_uri(company.logo)"
-                             style="width:18px; height:18px; object-fit:contain;" alt=""/>
+                             style="width:20px; height:20px; object-fit:contain;"
+                             alt=""/>
                     </div>
                 </t>
-                <span style="font-size:7pt; font-weight:700; color:#ffffff; letter-spacing:0.5px;"
+                <span style="font-size:8pt; font-weight:700; color:#333;"
                       t-esc="company.name"/>
             </div>
 
-            <!-- Product Info -->
-            <div style="padding:8px 10px 4px;">
-                <t t-if="template.show_name">
-                    <div style="font-size:11pt; font-weight:800; color:#1a1a1a; line-height:1.2; margin-bottom:2px;"
-                         t-esc="product.name"/>
-                </t>
-                <t t-if="template.show_internal_ref and product.default_code">
-                    <div style="font-size:7pt; color:#888; margin-bottom:2px;">
-                        <t t-if="product.product_template_attribute_value_ids">
-                            <t t-esc="product.default_code"/> |
-                            <t t-esc="', '.join(product.product_template_attribute_value_ids.mapped('name'))"/>
-                        </t>
-                        <t t-else="">
-                            <t t-esc="product.default_code"/>
-                        </t>
-                    </div>
-                </t>
-                <t t-if="template.show_category and product.categ_id">
-                    <div style="font-size:6.5pt; color:#aaa;" t-esc="product.categ_id.name"/>
-                </t>
-            </div>
+            <!-- Row 2: Product name -->
+            <t t-if="template.show_name">
+                <div style="font-size:12pt; font-weight:800; color:#111; line-height:1.2; margin-bottom:3px;"
+                     t-esc="product.name"/>
+            </t>
 
-            <!-- Bottom row: barcode left + price right -->
-            <div style="display:flex; align-items:stretch; margin-top:4px;">
+            <!-- Row 3: SKU | Variant -->
+            <t t-if="template.show_internal_ref and product.default_code">
+                <div style="font-size:7.5pt; color:#888; margin-bottom:10px;">
+                    <t t-esc="product.default_code"/>
+                    <t t-if="product.product_template_attribute_value_ids">
+                        | <t t-esc="', '.join(product.product_template_attribute_value_ids.mapped('name'))"/>
+                    </t>
+                </div>
+            </t>
 
-                <!-- Barcode section -->
-                <div style="flex:1; padding:4px 10px 8px;">
+            <!-- Row 4: Barcode left + Price badge right -->
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+
+                <!-- Barcode -->
+                <div style="flex:1;">
                     <t t-if="template.show_barcode and product.barcode">
                         <div t-out="product.barcode"
-                             t-options="{'widget': 'barcode', 'symbology': 'auto', 'img_style': 'width:100%; max-height:38px;'}"/>
-                        <div style="font-size:5.5pt; color:#999; letter-spacing:1px; text-align:center; margin-top:1px;"
+                             t-options="{'widget': 'barcode', 'symbology': 'auto', 'img_style': 'width:100%; max-height:42px;'}"/>
+                        <div style="font-size:6pt; color:#aaa; letter-spacing:1px; text-align:center; margin-top:1px;"
                              t-esc="product.barcode"/>
                     </t>
                     <t t-if="template.show_qr_code and product.barcode">
-                        <div style="margin-top:4px;">
+                        <div style="margin-top:4px; text-align:center;">
                             <div t-out="product.barcode"
                                  t-options="{'widget': 'barcode', 'symbology': 'QR', 'img_style': 'width:45px;height:45px;'}"/>
                         </div>
                     </t>
                 </div>
 
-                <!-- Price badge -->
+                <!-- Price Badge -->
                 <t t-if="template.show_price">
-                    <div t-attf-style="background:#{template.header_color or '#6c3fc5'}; display:flex; align-items:center; justify-content:center; padding:8px 14px; min-width:22mm; border-radius:0 0 0 12px;">
+                    <div t-attf-style="background:#{template.header_color or '#1a1a5e'}; border-radius:8px; padding:8px 14px; text-align:center; flex-shrink:0;">
                         <span style="font-size:14pt; font-weight:900; color:#ffffff; white-space:nowrap;">
                             <t t-esc="product.currency_id.symbol"/>
                             <t t-esc="'%.2f' % product.lst_price"/>
@@ -95,7 +89,7 @@
 
             <!-- Footer Note -->
             <t t-if="template.notes">
-                <div style="font-size:6pt; color:#bbb; text-align:center; padding:3px; border-top:1px solid #f0f0f0;"
+                <div style="font-size:6pt; color:#ccc; text-align:center; margin-top:6px; border-top:1px solid #f5f5f5; padding-top:4px;"
                      t-esc="template.notes"/>
             </t>
         </div>
